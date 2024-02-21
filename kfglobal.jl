@@ -1,16 +1,18 @@
+using SparseArrays
+
 function kfglobal(elem, no)
     # Número de elementos e de graus de liberdade
     nelem = length(elem)
     nnos = length(no)
 
     # Definição da matriz K como esparsa
-    kg = sparse(I, I, zeros(nnos, nnos))
+    kg = spzeros(nnos, nnos)
 
-    for i in 1:nelem
+    for el in elem
         # Matriz local dos elementos
-        ke = elem[i].k * [1 -1; -1 1]
+        ke = el["k"] * [1 -1; -1 1]
         # Vetor de conectividades
-        cnt = elem[i].cnt
+        cnt = el["cnt"]
         # Montagem da matriz K global
         kg[cnt, cnt] .= kg[cnt, cnt] .+ ke
     end
@@ -18,10 +20,10 @@ function kfglobal(elem, no)
     # Montagem do vetor f global
     fg = zeros(nnos)
     for i in 1:nnos
-        if isempty(no[i].f)
+        if isempty(no[i]["f"]) # A chamada de índices de um dicionário é feita assim: 'dado["chave"]'
             fg[i] = 0
         else
-            fg[i] = no[i].f
+            fg[i] = no[i]["f"]
         end
     end
 
